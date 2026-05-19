@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Academic Hub & Predictive Engine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f17;
+            --card-bg: #131b2e;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent-blue: #38bdf8;
+            --accent-orange: #fb923c;
+            --accent-red: #f87171;
+            --accent-green: #4ade80;
+            --btn-success: #16a34a;
+            --btn-success-hover: #15803d;
+            --input-bg: #1e293b;
+            --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+        }
+
+        [data-theme="cyberpunk"] {
+            --bg-color: #0f051d;
+            --card-bg: #1a0b2e;
+            --border-color: rgba(255, 0, 127, 0.3);
+            --text-main: #00ffff;
+            --text-muted: #ff007f;
+            --accent-blue: #00ffff;
+            --accent-orange: #ff00ff;
+            --accent-red: #ff0055;
+            --accent-green: #00ff66;
+            --btn-success: #ff007f;
+            --btn-success-hover: #cc0066;
+            --input-bg: #250f3e;
+            --card-shadow: 0 0 20px rgba(255, 0, 127, 0.2);
+        }
+
+        [data-theme="matrix"] {
+            --bg-color: #000000;
+            --card-bg: #030a03;
+            --border-color: rgba(0, 255, 0, 0.4);
+            --text-main: #00ff00;
+            --text-muted: #008000;
+            --accent-blue: #00ff00;
+            --accent-orange: #00ff00;
+            --accent-red: #ff0000;
+            --accent-green: #00ff00;
+            --btn-success: #005500;
+            --btn-success-hover: #008800;
+            --input-bg: #051405;
+            --card-shadow: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 35px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        h1 { font-size: 26px; font-weight: 700; margin: 0 0 6px 0; letter-spacing: -0.02em; }
+        .subtitle { color: var(--text-muted); font-size: 14px; }
+
+        .selectors-hub { display: flex; gap: 12px; }
+        .selectors-hub select, .view-toggle-btn {
+            padding: 10px 16px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .selectors-hub select:hover, .view-toggle-btn:hover { border-color: var(--accent-blue); }
+        .view-toggle-btn { background-color: var(--input-bg); border-color: var(--accent-blue); }
+
+        #region-dropdown { border-color: rgba(56, 189, 248, 0.4); color: var(--accent-blue); }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        .card:hover { border-color: rgba(255, 255, 255, 0.15); }
+
+        .card-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-bottom: 8px; }
+        .card-value { font-size: 28px; font-weight: 700; color: var(--text-main); letter-spacing: -0.02em; }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 35px;
+        }
+
+        @media (max-width: 900px) { .main-content { grid-template-columns: 1fr; } }
+
+        .form-group { margin-bottom: 16px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        label { display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; }
+        
+        input, select {
+            width: 100%; padding: 11px 14px; background-color: var(--input-bg);
+            border: 1px solid var(--border-color); border-radius: 10px;
+            color: var(--text-main); font-size: 14px; font-family: inherit;
+            box-sizing: border-box; transition: all 0.2s ease;
+        }
+        input:focus, select:focus { outline: none; border-color: var(--accent-blue); background-color: var(--card-bg); }
+
+        .btn-submit {
+            width: 100%; padding: 13px; background-color: var(--btn-success); color: #ffffff;
+            border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
+            cursor: pointer; margin-top: 6px; transition: background-color 0.2s ease;
+        }
+        .btn-submit:hover { background-color: var(--btn-success-hover); }
+
+        .feed-header {
+            font-size: 13px; font-weight: 600; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        .task-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 35px; }
+
+        /* Priority Heatmap item styling classes */
+        .task-item {
+            background-color: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 14px; padding: 16px 20px; display: flex;
+            justify-content: space-between; align-items: center; box-shadow: var(--card-shadow);
+            transition: all 0.2s ease; border-left: 6px solid transparent;
+        }
+        .task-item:hover { transform: translateX(4px); border-color: rgba(255, 255, 255, 0.15); }
+        
+        .priority-critical { border-left-color: var(--accent-red); background: linear-gradient(90deg, rgba(248,113,113,0.05) 0%, var(--card-bg) 100%); }
+        .priority-warning { border-left-color: var(--accent-orange); background: linear-gradient(90deg, rgba(251,146,60,0.03) 0%, var(--card-bg) 100%); }
+        .priority-normal { border-left-color: var(--accent-blue); }
+
+        .task-info h3 { margin: 0 0 6px 0; color: var(--text-main); font-size: 15px; font-weight: 600; }
+        .task-meta { display: flex; gap: 16px; font-size: 12px; color: var(--text-muted); }
+        .task-meta-item { display: flex; align-items: center; gap: 6px; }
+
+        .action-btns { display: flex; gap: 8px; }
+        .btn-action {
+            background-color: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color);
+            color: var(--text-main); padding: 7px 12px; border-radius: 8px;
+            cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s ease;
+        }
+        .btn-green:hover { background: rgba(74, 222, 128, 0.15); border-color: var(--accent-green); color: var(--accent-green); }
+        .btn-red:hover { background: rgba(248, 113, 113, 0.15); border-color: var(--accent-red); color: var(--accent-red); }
+
+        .weight-badge {
+            font-size: 11px; background-color: rgba(56, 189, 248, 0.1);
+            padding: 3px 8px; border-radius: 6px; font-weight: 600; color: var(--accent-blue); margin-left: 8px;
+        }
+
+        .urgency-indicator { font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+        .urgency-red { background-color: rgba(248,113,113,0.15); color: var(--accent-red); }
+        .urgency-orange { background-color: rgba(251,146,60,0.15); color: var(--accent-orange); }
+
+        /* Calendar View Styles Matrix */
+        .calendar-view {
+            display: grid; grid-template-columns: repeat(7, 1fr);
+            gap: 10px; background-color: var(--card-bg);
+            border: 1px solid var(--border-color); border-radius: 16px; padding: 20px;
+        }
+        .calendar-day-header { text-align: center; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; padding-bottom: 8px; }
+        .calendar-cell {
+            min-height: 85px; background-color: var(--input-bg); border: 1px solid var(--border-color);
+            border-radius: 10px; padding: 8px; display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .calendar-cell .day-number { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+        .calendar-event-tag {
+            font-size: 10px; padding: 2px 4px; border-radius: 4px; margin-top: 4px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;
+        }
+
+        .system-footer {
+            margin-top: 50px; border-top: 1px solid var(--border-color); padding-top: 20px;
+            display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted);
+        }
+        .sync-btn-hub { display: flex; gap: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div>
+                <h1>🌍 Universal Academic Engine</h1>
+                <div class="subtitle">Premium Hybrid tracking for UK Classifications & Pakistani HEC GPA systems.</div>
+            </div>
+            <div class="selectors-hub">
+                <button class="view-toggle-btn" id="toggle-view-btn" onclick="toggleMainDisplayView()">📅 Switch to Calendar View</button>
+                <select id="region-dropdown" onchange="toggleGradingSystem(this.value)">
+                    <option value="PK">🇵🇰 Pakistani System (HEC)</option>
+                    <option value="UK">🇬🇧 UK System (Honours)</option>
+                </select>
+                <select id="theme-dropdown" onchange="changeTheme(this.value)">
+                    <option value="default">Midnight Dark</option>
+                    <option value="cyberpunk">Cyberpunk Neon</option>
+                    <option value="matrix">Matrix Code</option>
+                </select>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="card">
+                <div class="card-title">Pending Tasks</div>
+                <div class="card-value" id="stat-pending" style="color: var(--accent-orange);">0</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Semester Average</div>
+                <div class="card-value" id="stat-avg" style="color: var(--accent-blue);">0%</div>
+            </div>
+            <div class="card">
+                <div class="card-title" id="title-classification">Estimated Award</div>
+                <div class="card-value" id="stat-award" style="color: var(--accent-green);">0.00 (N/A)</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Target Goal Status</div>
+                <div class="card-value" id="stat-target" style="color: var(--accent-red);">N/A</div>
+            </div>
+            <div class="card" style="border-color: rgba(74, 222, 128, 0.25);">
+                <div class="card-title" style="color: var(--accent-green);">Predicted Career CGPA</div>
+                <div class="card-value" id="stat-cgpa" style="color: var(--accent-green);">N/A</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div style="display: flex; flex-direction: column; gap: 25px;">
+                <div class="card">
+                    <div class="feed-header" style="margin-top:0;">Log Academic Task</div>
+                    <form id="task-form">
+                        <div class="form-group">
+                            <label for="task-name">Task Name</label>
+                            <input type="text" id="task-name" placeholder="e.g., Final Case Paper" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="module-name">Subject / Course Name</label>
+                            <input type="text" id="module-name" placeholder="e.g., Data structures & Algorithms" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="task-weight">Weighting (%)</label>
+                                <input type="number" id="task-weight" min="1" max="100" placeholder="25" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="due-date">Due Date</label>
+                                <input type="date" id="due-date" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-submit">Add Assignment</button>
+                    </form>
+
+                    <div class="feed-header" style="margin-top: 30px; margin-bottom: 12px;">Set Performance Target</div>
+                    <div id="target-selector-container"></div>
+                </div>
+
+                <div class="card" style="background: linear-gradient(180deg, var(--card-bg) 0%, rgba(11,15,23,0.5) 100%);">
+                    <div class="feed-header" style="margin-top:0; color: var(--accent-green);">CGPA Calculator Module</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label id="credit-label">Prior Credit Hours</label>
+                            <input type="number" id="prior-credits" placeholder="e.g., 60" oninput="renderTasks()">
+                        </div>
+                        <div class="form-group">
+                            <label id="gpa-label">Prior Cumulative GPA</label>
+                            <input type="number" id="prior-gpa" step="0.01" placeholder="e.g., 3.40" oninput="renderTasks()">
+                        </div>
+                    </div>
+                    <p style="font-size: 11px; color: var(--text-muted); margin: 0; line-height: 1.4;">Inputs fuse active semester results with historical data to generate real-time global CGPA trends.</p>
+                </div>
+            </div>
+
+            <div id="dashboard-right-feed">
+                <div id="feed-list-view">
+                    <div class="feed-header">Active Priority Deadlines <span style="font-size:11px; font-weight:400; text-transform:none;">Sorted by timeline urgency heatmaps</span></div>
+                    <div class="task-list" id="task-container"></div>
+
+                    <div class="feed-header">Graded Achievements Log</div>
+                    <div class="task-list" id="completed-container"></div>
+                </div>
+
+                <div id="feed-calendar-view" style="display: none;">
+                    <div class="feed-header" id="calendar-month-title">Academic Schedule Map</div>
+                    <div class="calendar-view" id="calendar-grid-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="system-footer">
+            <div>All tracking engines operational. Data safely cached locally via browser structures.</div>
+            <div class="sync-btn-hub">
+                <button class="btn-action" onclick="exportJSONBackup()">📤 Export Backup Data</button>
+                <button class="btn-action" onclick="triggerImportSelection()">📥 Import Backup File</button>
+                <input type="file" id="hidden-file-input" style="display: none;" onchange="importJSONBackup(this)">
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const defaultTasks = [
+        { name: "midterm", module: "coding", weight: "30", date: "2026-05-19" },
+        { name: "assignment", module: "Arrays & Data Structures", weight: "40", date: "2026-05-25" },
+        { name: "Final exam", module: "Database & Algorithms", weight: "60", date: "2026-06-03" }
+    ];
+
+    const defaultCompleted = [
+        { name: "Midterm", module: "discrete mathematics", weight: "40", grade: "81.8" },
+        { name: "FINAL AMES TEST", module: "Silicon to C", weight: "60", grade: "85" },
+        { name: "Team Software project", module: "Naqsh app final vlog", weight: "70", grade: "70" },
+        { name: "assignment 2", module: "quering", weight: "50", grade: "98" }
+    ];
+
+    if (!localStorage.getItem('global-uni-initialized')) {
+        localStorage.setItem('global-uni-tasks', JSON.stringify(defaultTasks));
+        localStorage.setItem('global-uni-completed', JSON.stringify(defaultCompleted));
+        localStorage.setItem('global-uni-initialized', 'true');
+    }
+    // 
+        let tasks = JSON.parse(localStorage.getItem('global-uni-tasks')) || [];
+        let completedTasks = JSON.parse(localStorage.getItem('global-uni-completed')) || [];
+        let activeRegion = localStorage.getItem('global-region') || 'PK';
+        let activeDisplayMode = 'list'; // Toggles between 'list' and 'calendar'
+
+        function changeTheme(themeName) {
+            document.documentElement.setAttribute('data-theme', themeName);
+            localStorage.setItem('global-theme', themeName);
+        }
+        const savedTheme = localStorage.getItem('global-theme') || 'default';
+        document.getElementById('theme-dropdown').value = savedTheme;
+        changeTheme(savedTheme);
+
+        function getPakGradeAndGPA(percentage) {
+            if (percentage >= 85) return { gpa: 4.00, label: "A" };
+            if (percentage >= 80) return { gpa: 3.66, label: "A-" };
+            if (percentage >= 75) return { gpa: 3.33, label: "B+" };
+            if (percentage >= 70) return { gpa: 3.00, label: "B" };
+            if (percentage >= 65) return { gpa: 2.66, label: "B-" };
+            if (percentage >= 61) return { gpa: 2.33, label: "C+" };
+            if (percentage >= 58) return { gpa: 2.00, label: "C" };
+            if (percentage >= 55) return { gpa: 1.66, label: "C-" };
+            if (percentage >= 50) return { gpa: 1.00, label: "D" };
+            return { gpa: 0.00, label: "F" };
+        }
+
+        function getUKClassification(percentage) {
+            if (percentage >= 70) return { label: "First Class (1st)", gpa: 4.0 };
+            if (percentage >= 60) return { label: "Upper Second (2:1)", gpa: 3.3 };
+            if (percentage >= 50) return { label: "Lower Second (2:2)", gpa: 2.7 };
+            if (percentage >= 40) return { label: "Third Class (3rd)", gpa: 2.0 };
+            return { label: "Fail", gpa: 0.0 };
+        }
+
+        function getSubjectColor(subjectName) {
+            if (!subjectName) return '#38bdf8';
+            let hash = 0;
+            for (let i = 0; i < subjectName.length; i++) hash = subjectName.charCodeAt(i) + ((hash << 5) - hash);
+            const cleanPalettes = ['#38bdf8', '#fb923c', '#f87171', '#60a5fa', '#34d399', '#a78bfa', '#fb7185', '#facc15'];
+            return cleanPalettes[Math.abs(hash) % cleanPalettes.length];
+        }
+
+        function formatDisplayDate(dateString) {
+            if (!dateString) return '';
+            return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        function toggleMainDisplayView() {
+            const listFeed = document.getElementById('feed-list-view');
+            const calendarFeed = document.getElementById('feed-calendar-view');
+            const toggleBtn = document.getElementById('toggle-view-btn');
+
+            if (activeDisplayMode === 'list') {
+                activeDisplayMode = 'calendar';
+                listFeed.style.display = 'none';
+                calendarFeed.style.display = 'block';
+                toggleBtn.innerText = '📋 Switch to Feed List';
+                buildInteractiveCalendarGrid();
+            } else {
+                activeDisplayMode = 'list';
+                listFeed.style.display = 'block';
+                calendarFeed.style.display = 'none';
+                toggleBtn.innerText = '📅 Switch to Calendar View';
+            }
+        }
+
+        function toggleGradingSystem(region) {
+            activeRegion = region;
+            localStorage.setItem('global-region', region);
+            
+            const targetContainer = document.getElementById('target-selector-container');
+            const creditLabel = document.getElementById('credit-label');
+            const gpaLabel = document.getElementById('gpa-label');
+
+            if (region === 'PK') {
+                targetContainer.innerHTML = `
+                    <select id="target-goal-selector" onchange="renderTasks()">
+                        <option value="85">Perfect 4.00 GPA (85%+ Marks)</option>
+                        <option value="80">Excellent 3.66 GPA (80% Marks)</option>
+                        <option value="75">Great 3.33 GPA (75% Marks)</option>
+                        <option value="70">Good 3.00 GPA (70% Marks)</option>
+                    </select>
+                `;
+                document.getElementById('title-classification').innerText = "Semester SGPA";
+                creditLabel.innerText = "Prior HEC Credit Hours";
+                gpaLabel.innerText = "Prior Cumulative CGPA";
+            } else {
+                targetContainer.innerHTML = `
+                    <select id="target-goal-selector" onchange="renderTasks()">
+                        <option value="70">First Class Honors (70%+)</option>
+                        <option value="60">Upper Second Class 2:1 (60%+)</option>
+                        <option value="50">Lower Second Class 2:2 (50%+)</option>
+                    </select>
+                `;
+                document.getElementById('title-classification').innerText = "UK Award Class";
+                creditLabel.innerText = "Prior Completed UK Credits";
+                gpaLabel.innerText = "Prior Class Avg (%)";
+            }
+            renderTasks();
+        }
+
+        function renderTasks() {
+            const taskContainer = document.getElementById('task-container');
+            const completedContainer = document.getElementById('completed-container');
+            
+            taskContainer.innerHTML = '';
+            completedContainer.innerHTML = '';
+
+            document.getElementById('stat-pending').innerText = tasks.length;
+
+            let totalWeightEarned = 0;
+            let totalGradePoints = 0;
+            let totalActiveWeight = 0;
+
+            completedTasks.forEach(task => {
+                totalWeightEarned += Number(task.weight);
+                totalGradePoints += (Number(task.grade) * (Number(task.weight) / 100));
+            });
+
+            tasks.forEach(task => { totalActiveWeight += Number(task.weight); });
+
+            let currentAvg = totalWeightEarned > 0 ? Math.round((totalGradePoints / totalWeightEarned) * 100) : 0;
+            document.getElementById('stat-avg').innerText = `${currentAvg}%`;
+
+            let currentSemesterGPA = 0;
+            if (totalWeightEarned > 0) {
+                if (activeRegion === 'PK') {
+                    let res = getPakGradeAndGPA(currentAvg);
+                    document.getElementById('stat-award').innerText = `${res.gpa.toFixed(2)} (${res.label})`;
+                    currentSemesterGPA = res.gpa;
+                } else {
+                    let res = getUKClassification(currentAvg);
+                    document.getElementById('stat-award').innerText = res.label;
+                    currentSemesterGPA = res.gpa;
+                }
+            } else {
+                document.getElementById('stat-award').innerText = "N/A";
+            }
+
+            // ADVANCED CUMULATIVE PREDICTIVE MATHEMATICS CORE ENGINE
+            const priorCreditsInput = document.getElementById('prior-credits').value;
+            const priorGpaInput = document.getElementById('prior-gpa').value;
+
+            if (priorCreditsInput && priorGpaInput && totalWeightEarned > 0) {
+                const priorC = Number(priorCreditsInput);
+                const priorG = Number(priorGpaInput);
+                // Assume standard current semester run weight value metrics context of 15 credits
+                const currentSemesterCredits = 15; 
+                
+                let calculatedGlobalCGPA = ((priorG * priorC) + (currentSemesterGPA * currentSemesterCredits)) / (priorC + currentSemesterCredits);
+                document.getElementById('stat-cgpa').innerText = activeRegion === 'PK' ? calculatedGlobalCGPA.toFixed(2) : `${Math.round(calculatedGlobalCGPA)}%`;
+            } else {
+                document.getElementById('stat-cgpa').innerText = 'Input Data';
+            }
+
+            // Target solver logic execution block
+            const targetElement = document.getElementById('target-goal-selector');
+            const targetMarksNeeded = targetElement ? Number(targetElement.value) : 70;
+            
+            if (tasks.length > 0) {
+                let pointsNeeded = (targetMarksNeeded * ((totalWeightEarned + totalActiveWeight) / 100)) - totalGradePoints;
+                let neededExamAvg = Math.round((pointsNeeded / (totalActiveWeight / 100)));
+                
+                if (neededExamAvg <= 0) document.getElementById('stat-target').innerText = 'Secured! 🎉';
+                else if (neededExamAvg > 100) document.getElementById('stat-target').innerText = 'Req. >100%';
+                else document.getElementById('stat-target').innerText = `${neededExamAvg}% Avg`;
+            } else {
+                document.getElementById('stat-target').innerText = 'Clear';
+            }
+
+            // URGENCY TIMELINE HEATMAP CALCULATIONS & OVERLAYS
+            // Sort tasks based on closest remaining time left index parameters
+            tasks.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            if(tasks.length === 0) {
+                taskContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 14px; font-style: italic; margin: 0;">No active assignments found.</p>';
+            }
+            
+            tasks.forEach((task, index) => {
+                let subjectColor = getSubjectColor(task.module);
+                
+                // Calculate calendar metric intervals
+                const daysLeft = Math.ceil((new Date(task.date) - new Date()) / (1000 * 60 * 60 * 24));
+                let priorityClass = 'priority-normal';
+                let urgencyBadge = '';
+
+                if (daysLeft >= 0 && daysLeft <= 2) {
+                    priorityClass = 'priority-critical';
+                    urgencyBadge = `<span class="urgency-indicator urgency-red">⚠️ Due in ${daysLeft}d</span>`;
+                } else if (daysLeft > 2 && daysLeft <= 7) {
+                    priorityClass = 'priority-warning';
+                    urgencyBadge = `<span class="urgency-indicator urgency-orange">⏳ ${daysLeft} days left</span>`;
+                } else if (daysLeft < 0) {
+                    priorityClass = 'priority-critical';
+                    urgencyBadge = `<span class="urgency-indicator urgency-red">OVERDUE</span>`;
+                }
+
+                taskContainer.insertAdjacentHTML('beforeend', `
+                    <div class="task-item ${priorityClass}">
+                        <div class="task-info">
+                            <h3>${task.name} ${urgencyBadge} <span class="weight-badge">${task.weight}% weight</span></h3>
+                            <div class="task-meta">
+                                <span class="task-meta-item" style="color: ${subjectColor}; font-weight:600;">📘 ${task.module}</span>
+                                <span class="task-meta-item">📅 Date: ${formatDisplayDate(task.date)}</span>
+                            </div>
+                        </div>
+                        <div class="action-btns">
+                            <button class="btn-action btn-green" onclick="markAsComplete(${index})">Grade</button>
+                            <button class="btn-action btn-red" onclick="deleteTask(${index}, false)">Remove</button>
+                        </div>
+                    </div>
+                `);
+            });
+
+            // Render Graded Archive Log Modules
+            if(completedTasks.length === 0) {
+                completedContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 14px; font-style: italic; margin: 0;">No graded achievements logged.</p>';
+            }
+            completedTasks.forEach((task, index) => {
+                let labelInfo = "";
+                let subjectColor = getSubjectColor(task.module);
+                if (activeRegion === 'PK') {
+                    labelInfo = `(${getPakGradeAndGPA(Number(task.grade)).label})`;
+                } else {
+                    labelInfo = `(${getUKClassification(Number(task.grade)).label.split(' ')[0]})`;
+                }
+                completedContainer.insertAdjacentHTML('beforeend', `
+                    <div class="task-item" style="opacity: 0.85;">
+                        <div class="task-info">
+                            <h3 style="color: var(--text-muted); font-weight: 500;">${task.name}</h3>
+                            <div class="task-meta">
+                                <span class="task-meta-item" style="color: ${subjectColor}; opacity: 0.8;">📘 ${task.module}</span>
+                                <span class="task-meta-item">⚖️ Weight: ${task.weight}%</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="font-weight: 700; color: var(--accent-green); font-size: 16px;">${task.grade}% <span style="font-size:12px; font-weight:500;">${labelInfo}</span></div>
+                            <button class="btn-action btn-red" onclick="deleteTask(${index}, true)">Delete</button>
+                        </div>
+                    </div>
+                `);
+            });
+
+            if (activeDisplayMode === 'calendar') buildInteractiveCalendarGrid();
+        }
+
+        // VISUAL MATRIX MONTHLY CALENDAR DESIGN ARCHITECTURE COMPONENT
+        function buildInteractiveCalendarGrid() {
+            const gridContainer = document.getElementById('calendar-grid-container');
+            gridContainer.innerHTML = '';
+
+            const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            weekdays.forEach(day => {
+                gridContainer.insertAdjacentHTML('beforeend', `<div class="calendar-day-header">${day}</div>`);
+            });
+
+            // Anchor logic configuration around May 2026 scheduling framework parameters
+            const currentYear = 2026;
+            const currentMonth = 4; // May (0-indexed framework maps May to index integer 4)
+            
+            document.getElementById('calendar-month-title').innerText = "Academic Schedule Map (May 2026)";
+
+            const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
+            const totalDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            // Insert empty cell items spacing offsets
+            for(let i = 0; i < firstDayIndex; i++) {
+                gridContainer.insertAdjacentHTML('beforeend', `<div class="calendar-cell" style="opacity:0.25;"></div>`);
+            }
+
+            // Generate structured interactive day cards
+            for(let day = 1; day <= totalDaysInMonth; day++) {
+                let dayString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                let matchingTasks = tasks.filter(t => t.date === dayString);
+                
+                let eventsMarkup = '';
+                matchingTasks.forEach(t => {
+                    let col = getSubjectColor(t.module);
+                    eventsMarkup += `<div class="calendar-event-tag" style="background-color: ${col}20; color: ${col}; border-left: 2px solid ${col};">${t.name}</div>`;
+                });
+
+                gridContainer.insertAdjacentHTML('beforeend', `
+                    <div class="calendar-cell">
+                        <div class="day-number">${day}</div>
+                        <div style="overflow:hidden; width:100%;">${eventsMarkup}</div>
+                    </div>
+                `);
+            }
+        }
+
+        // SYSTEM BACKUP CLOUD SYNC CONTROLLER INTERFACES
+        function exportJSONBackup() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
+                tasks: tasks,
+                completedTasks: completedTasks,
+                priorCredits: document.getElementById('prior-credits').value,
+                priorGpa: document.getElementById('prior-gpa').value,
+                region: activeRegion
+            }));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "academic_hub_backup.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function triggerImportSelection() {
+            document.getElementById('hidden-file-input').click();
+        }
+
+        function importJSONBackup(inputElement) {
+            const fileReader = new FileReader();
+            fileReader.onload = function(event) {
+                try {
+                    const parsedData = JSON.parse(event.target.result);
+                    if (parsedData.tasks) tasks = parsedData.tasks;
+                    if (parsedData.completedTasks) completedTasks = parsedData.completedTasks;
+                    
+                    localStorage.setItem('global-uni-tasks', JSON.stringify(tasks));
+                    localStorage.setItem('global-uni-completed', JSON.stringify(completedTasks));
+
+                    if(parsedData.priorCredits) document.getElementById('prior-credits').value = parsedData.priorCredits;
+                    if(parsedData.priorGpa) document.getElementById('prior-gpa').value = parsedData.priorGpa;
+                    if(parsedData.region) {
+                        activeRegion = parsedData.region;
+                        document.getElementById('region-dropdown').value = activeRegion;
+                    }
+                    
+                    toggleGradingSystem(activeRegion);
+                    alert("Database restore completed successfully! 🎉");
+                } catch (err) {
+                    alert("Error processing backup file format structure options.");
+                }
+            };
+            fileReader.readAsText(inputElement.files[0]);
+        }
+
+        document.getElementById('task-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            tasks.push({
+                name: document.getElementById('task-name').value,
+                module: document.getElementById('module-name').value,
+                weight: document.getElementById('task-weight').value,
+                date: document.getElementById('due-date').value
+            });
+            localStorage.setItem('global-uni-tasks', JSON.stringify(tasks));
+            renderTasks();
+            this.reset();
+        });
+
+        window.markAsComplete = function(index) {
+            let score = prompt("Enter mark value percentage obtained (0-100):");
+            if (score === null || score === "" || isNaN(score) || score < 0 || score > 100) return;
+            let task = tasks.splice(index, 1)[0];
+            task.grade = score;
+            completedTasks.push(task);
+            localStorage.setItem('global-uni-tasks', JSON.stringify(tasks));
+            localStorage.setItem('global-uni-completed', JSON.stringify(completedTasks));
+            renderTasks();
+        };
+
+        window.deleteTask = function(index, isCompleted) {
+            if (isCompleted) {
+                completedTasks.splice(index, 1);
+                localStorage.setItem('global-uni-completed', JSON.stringify(completedTasks));
+            } else {
+                tasks.splice(index, 1);
+                localStorage.setItem('global-uni-tasks', JSON.stringify(tasks));
+            }
+            renderTasks();
+        };
+
+        document.getElementById('region-dropdown').value = activeRegion;
+        toggleGradingSystem(activeRegion);
+    </script>
+</body>
+</html>
